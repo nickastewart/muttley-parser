@@ -1,7 +1,7 @@
-package model 
+package model
 
 type DriverInfo struct {
 	Name     string
-	Pos      string
+	Position string
 	RaceType string
 }

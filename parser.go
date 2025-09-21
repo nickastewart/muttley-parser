@@ -71,12 +71,12 @@ func parseEvent(rawHtml string, subject string, date string) model.Event {
 
 	var driverInfo model.DriverInfo = model.DriverInfo{
 		Name: extractTextIter(driverInfoHtml[3])[1],
+		Position: stripPosition(extractTextIter(driverInfoHtml[4])[2]),
 	}
 
 	var raceInfo model.Event = model.Event{
 		Date:     stripTime(date),
 		Location: getLocationFromSubject(subject),
-		Position: stripPosition(extractTextIter(driverInfoHtml[4])[2]),
 		RaceType: extractTextIter(driverInfoHtml[6])[1],
 	}
 
@@ -88,7 +88,7 @@ func parseEvent(rawHtml string, subject string, date string) model.Event {
 			continue
 		}
 		row := extractTextIter(row)
-		if row[0] == raceInfo.Position {
+		if row[0] == driverInfo.Position {
 			data := model.DriverTime{
 				Pos:    row[0],
 				Kart:   row[1],
@@ -123,7 +123,7 @@ func stripTime(date string) string {
 
 func getLocationFromSubject(subject string) string {
 	if strings.Contains(subject, "Milton Keynes") {
-		return "Milton Keynes"
+		return "Daytona Milton Keynes"
 	}
 	return "Unrecognised"
 }
