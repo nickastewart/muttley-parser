@@ -118,7 +118,7 @@ func parseEvent(rawHtml string, subject string, date string) model.Event {
 }
 
 func stripTime(date string) string {
-	return date[0:12]
+	return strings.Trim(date[0:12], " ")
 }
 
 func getLocationFromSubject(subject string) string {
