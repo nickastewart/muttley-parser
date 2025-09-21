@@ -8,9 +8,9 @@ import (
 	"log"
 	"net/mail"
 	"os"
-	"racer-parser/model"
 	"strconv"
 	"strings"
+	"github.com/nickastewart/racer-parser/model"
 	"unicode"
 )
 

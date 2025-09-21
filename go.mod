@@ -1,4 +1,4 @@
-module racer-parser
+module github.com/nickastewart/racer-parser
 
 go 1.24.2
 
