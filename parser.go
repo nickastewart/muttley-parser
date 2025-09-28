@@ -3,23 +3,29 @@ package parser
 import (
 	"bufio"
 	"bytes"
-	"golang.org/x/net/html"
 	"io"
 	"log"
 	"net/mail"
 	"os"
 	"strconv"
 	"strings"
-	"github.com/nickastewart/racer-parser/model"
 	"unicode"
+
+	"github.com/nickastewart/racer-parser/model"
+	"golang.org/x/net/html"
 )
 
-func Parse(path string) model.Event {
+func ParseFromPath(path string) model.Event {
 	data, err := os.ReadFile(path)
 
 	if err != nil {
 		log.Panic(err)
 	}
+
+	return ParseFile(data)
+}
+
+func ParseFile(data []byte) model.Event {
 
 	message, err := mail.ReadMessage(bytes.NewReader(data))
 
@@ -40,6 +46,7 @@ func Parse(path string) model.Event {
 	var html string = getHtml(body)
 	var event model.Event = parseEvent(html, message.Header.Get("Subject"), message.Header.Get("Date"))
 	return event
+
 }
 
 func getHtml(data string) string {
