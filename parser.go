@@ -2,11 +2,9 @@ package parser
 
 import (
 	"bufio"
-	"bytes"
 	"io"
 	"log"
 	"net/mail"
-	"os"
 	"strconv"
 	"strings"
 	"unicode"
@@ -15,26 +13,14 @@ import (
 	"golang.org/x/net/html"
 )
 
-func ParseFromPath(path string) model.Event {
-	data, err := os.ReadFile(path)
-
-	if err != nil {
-		log.Panic(err)
-	}
-
-	return ParseFile(data)
-}
-
-func ParseFile(data []byte) model.Event {
-
-	message, err := mail.ReadMessage(bytes.NewReader(data))
+func ParseFile(reader io.Reader) model.Event {
+	message, err := mail.ReadMessage(reader)
 
 	if err != nil {
 		log.Panic(err)
 	}
 
 	buf := new(strings.Builder)
-
 	_, err = io.Copy(buf, message.Body)
 
 	if err != nil {
@@ -46,7 +32,6 @@ func ParseFile(data []byte) model.Event {
 	var html string = getHtml(body)
 	var event model.Event = parseEvent(html, message.Header.Get("Subject"), message.Header.Get("Date"))
 	return event
-
 }
 
 func getHtml(data string) string {
@@ -68,6 +53,7 @@ func getHtml(data string) string {
 			}
 		}
 	}
+
 	return strings.Join(htmlStrings, "")
 }
 
