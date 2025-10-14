@@ -1,7 +1,7 @@
 package model
 
 type DriverTime struct {
-	Pos    string
+	Pos    int8
 	Kart   string
 	Racer  string
 	Best   int

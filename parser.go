@@ -13,7 +13,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func ParseFile(reader io.Reader) model.Event {
+func ParseFile(reader io.Reader) (*model.Event, error) {
 	message, err := mail.ReadMessage(reader)
 
 	if err != nil {
@@ -30,8 +30,9 @@ func ParseFile(reader io.Reader) model.Event {
 	body := buf.String()
 
 	var html string = getHtml(body)
-	var event model.Event = parseEvent(html, message.Header.Get("Subject"), message.Header.Get("Date"))
-	return event
+	event, err := parseEvent(html, message.Header.Get("Subject"), message.Header.Get("Date"))
+
+	return event, err
 }
 
 func getHtml(data string) string {
@@ -57,14 +58,20 @@ func getHtml(data string) string {
 	return strings.Join(htmlStrings, "")
 }
 
-func parseEvent(rawHtml string, subject string, date string) model.Event {
+func parseEvent(rawHtml string, subject string, date string) (*model.Event, error) {
 	rootNode, _ := html.Parse(strings.NewReader(rawHtml))
 	var tables []*html.Node = searchHtml(rootNode, "table", []*html.Node{})
 	var driverInfoHtml []*html.Node = searchHtml(tables[0], "tr", []*html.Node{})
 
+	position, err := strconv.ParseInt(stripPosition(extractTextIter(driverInfoHtml[4])[2]), 10, 8)
+
+	if err != nil {
+		return nil, err
+	}
+
 	var driverInfo model.DriverInfo = model.DriverInfo{
-		Name: extractTextIter(driverInfoHtml[3])[1],
-		Position: stripPosition(extractTextIter(driverInfoHtml[4])[2]),
+		Name:     extractTextIter(driverInfoHtml[3])[1],
+		Position: int8(position),
 	}
 
 	var raceInfo model.Event = model.Event{
@@ -81,9 +88,16 @@ func parseEvent(rawHtml string, subject string, date string) model.Event {
 			continue
 		}
 		row := extractTextIter(row)
-		if row[0] == driverInfo.Position {
+		rowPos, err := strconv.ParseInt(row[0], 10, 8)
+
+		if err != nil {
+			return nil, err
+		}
+
+		var rowPosInt8 int8 = int8(rowPos)
+		if rowPosInt8 == driverInfo.Position {
 			data := model.DriverTime{
-				Pos:    row[0],
+				Pos:    rowPosInt8,
 				Kart:   row[1],
 				Racer:  driverInfo.Name,
 				Best:   convertFromStringTime(row[2]),
@@ -94,7 +108,7 @@ func parseEvent(rawHtml string, subject string, date string) model.Event {
 			raceData = append(raceData, data)
 		} else {
 			data := model.DriverTime{
-				Pos:    row[0],
+				Pos:    rowPosInt8,
 				Kart:   row[1],
 				Racer:  row[2],
 				Best:   convertFromStringTime(row[3]),
@@ -105,9 +119,10 @@ func parseEvent(rawHtml string, subject string, date string) model.Event {
 			raceData = append(raceData, data)
 		}
 	}
+
 	raceInfo.DriverTimes = raceData
 	raceInfo.DriverInfo = driverInfo
-	return raceInfo
+	return &raceInfo, err
 }
 
 func stripTime(date string) string {
