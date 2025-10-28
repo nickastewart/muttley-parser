@@ -95,23 +95,33 @@ func parseEvent(rawHtml string, subject string, date string) (*model.Event, erro
 		}
 
 		if rowPos == driverInfo.Position {
+			noLaps, err := strconv.Atoi(row[3])
+			if err != nil {
+				return nil, err
+			}
+
 			data := model.DriverTime{
 				Pos:    rowPos,
 				Kart:   row[1],
 				Racer:  driverInfo.Name,
 				Best:   convertFromStringTime(row[2]),
-				NoLaps: row[3],
+				NoLaps: noLaps,
 				Avg:    convertFromStringTime(row[4]),
 				Gap:    row[5],
 			}
 			raceData = append(raceData, data)
 		} else {
+			noLaps, err := strconv.Atoi(row[4])
+			if err != nil {
+				return nil, err
+			}
+
 			data := model.DriverTime{
 				Pos:    rowPos,
 				Kart:   row[1],
 				Racer:  row[2],
 				Best:   convertFromStringTime(row[3]),
-				NoLaps: row[4],
+				NoLaps: noLaps,
 				Avg:    convertFromStringTime(row[5]),
 				Gap:    row[6],
 			}

@@ -5,7 +5,7 @@ type DriverTime struct {
 	Kart   string
 	Racer  string
 	Best   int
-	NoLaps string
+	NoLaps int
 	Avg    int
 	Gap    string
 }
