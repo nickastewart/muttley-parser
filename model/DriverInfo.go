@@ -2,5 +2,5 @@ package model
 
 type DriverInfo struct {
 	Name     string
-	Position int8
+	Position int
 }

@@ -63,7 +63,7 @@ func parseEvent(rawHtml string, subject string, date string) (*model.Event, erro
 	var tables []*html.Node = searchHtml(rootNode, "table", []*html.Node{})
 	var driverInfoHtml []*html.Node = searchHtml(tables[0], "tr", []*html.Node{})
 
-	position, err := strconv.ParseInt(stripPosition(extractTextIter(driverInfoHtml[4])[2]), 10, 8)
+	position, err := strconv.Atoi(stripPosition(extractTextIter(driverInfoHtml[4])[2]))
 
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func parseEvent(rawHtml string, subject string, date string) (*model.Event, erro
 
 	var driverInfo model.DriverInfo = model.DriverInfo{
 		Name:     extractTextIter(driverInfoHtml[3])[1],
-		Position: int8(position),
+		Position: position,
 	}
 
 	var raceInfo model.Event = model.Event{
@@ -88,16 +88,15 @@ func parseEvent(rawHtml string, subject string, date string) (*model.Event, erro
 			continue
 		}
 		row := extractTextIter(row)
-		rowPos, err := strconv.ParseInt(row[0], 10, 8)
+		rowPos, err := strconv.Atoi(row[0])
 
 		if err != nil {
 			return nil, err
 		}
 
-		var rowPosInt8 int8 = int8(rowPos)
-		if rowPosInt8 == driverInfo.Position {
+		if rowPos == driverInfo.Position {
 			data := model.DriverTime{
-				Pos:    rowPosInt8,
+				Pos:    rowPos,
 				Kart:   row[1],
 				Racer:  driverInfo.Name,
 				Best:   convertFromStringTime(row[2]),
@@ -108,7 +107,7 @@ func parseEvent(rawHtml string, subject string, date string) (*model.Event, erro
 			raceData = append(raceData, data)
 		} else {
 			data := model.DriverTime{
-				Pos:    rowPosInt8,
+				Pos:    rowPos,
 				Kart:   row[1],
 				Racer:  row[2],
 				Best:   convertFromStringTime(row[3]),
