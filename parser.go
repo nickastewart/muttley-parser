@@ -9,7 +9,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/nickastewart/racer-parser/model"
+	"github.com/nickastewart/muttley-parser/model"
 	"golang.org/x/net/html"
 )
 

@@ -1,4 +1,4 @@
-module github.com/nickastewart/racer-parser
+module github.com/nickastewart/muttley-parser
 
 go 1.24.2
 
