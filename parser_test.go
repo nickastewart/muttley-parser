@@ -26,6 +26,10 @@ func TestParserLocationMiltonKeynes(t *testing.T) {
 	if event.Date != "16 Jul 2024" {
 		t.Errorf(`ParseFile("2024-07-16-Milton-Keynes.eml") = %q, %v, want match for %#q, nil`, event.Date, err, "16 Jul 2024")
 	}
+
+	if event.RaceType == "`(2024 SODI 40min. Race)`" {
+		t.Errorf(`ParseFile("2024-07-16-Milton-Keynes.eml") = %q, %v, want match for %#q, nil`, event.RaceType, err, "(2024 SODI 40min. Race)")
+	}
 }
 
 func TestParserSandown(t *testing.T) {
@@ -50,6 +54,10 @@ func TestParserSandown(t *testing.T) {
 
 	if event.Date != "5 Mar 2026" {
 		t.Errorf(`ParseFile("2026-03-05-sandown.eml") = %q, %v, want match for %#q, nil`, event.Date, err, "5 Mar 2026")
+	}
+
+	if event.RaceType == "`(2024 SODI 40min. Race)`" {
+		t.Errorf(`ParseFile("2026-03-05-sandown.eml") = %q, %v, want match for %#q, nil`, event.RaceType, err, "(2024 SODI 40min. Race)")
 	}
 
 }

@@ -77,7 +77,7 @@ func parseEvent(rawHtml string, subject string, date string, location string) (*
 	var raceInfo model.Event = model.Event{
 		Date:     stripTime(date, location),
 		Location: getLocationFromSubject(subject),
-		RaceType: extractTextIter(driverInfoHtml[6])[1],
+		RaceType: strings.ReplaceAll(extractTextIter(driverInfoHtml[6])[1], "`", ""),
 	}
 
 	var raceData []model.DriverTime
