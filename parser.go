@@ -13,7 +13,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func ParseFile(reader io.Reader) (*model.Event, error) {
+func ParseFile(location string, reader io.Reader) (*model.Event, error) {
 	message, err := mail.ReadMessage(reader)
 
 	if err != nil {
@@ -30,7 +30,7 @@ func ParseFile(reader io.Reader) (*model.Event, error) {
 	body := buf.String()
 
 	var html string = getHtml(body)
-	event, err := parseEvent(html, message.Header.Get("Subject"), message.Header.Get("Date"))
+	event, err := parseEvent(html, message.Header.Get("Subject"), message.Header.Get("Date"), location)
 
 	return event, err
 }
@@ -58,7 +58,7 @@ func getHtml(data string) string {
 	return strings.Join(htmlStrings, "")
 }
 
-func parseEvent(rawHtml string, subject string, date string) (*model.Event, error) {
+func parseEvent(rawHtml string, subject string, date string, location string) (*model.Event, error) {
 	rootNode, _ := html.Parse(strings.NewReader(rawHtml))
 	var tables []*html.Node = searchHtml(rootNode, "table", []*html.Node{})
 	var driverInfoHtml []*html.Node = searchHtml(tables[0], "tr", []*html.Node{})
@@ -75,7 +75,7 @@ func parseEvent(rawHtml string, subject string, date string) (*model.Event, erro
 	}
 
 	var raceInfo model.Event = model.Event{
-		Date:     stripTime(date),
+		Date:     stripTime(date, location),
 		Location: getLocationFromSubject(subject),
 		RaceType: extractTextIter(driverInfoHtml[6])[1],
 	}
@@ -134,13 +134,20 @@ func parseEvent(rawHtml string, subject string, date string) (*model.Event, erro
 	return &raceInfo, err
 }
 
-func stripTime(date string) string {
+func stripTime(date string, location string) string {
+	if location == "Daytona Sandown Park" {
+		return strings.Trim(date[0:11], " ")
+	}
 	return strings.Trim(date[0:12], " ")
 }
 
 func getLocationFromSubject(subject string) string {
-	if strings.Contains(subject, "Milton Keynes") {
+	if strings.Contains(subject, "Daytona Milton Keynes") {
 		return "Daytona Milton Keynes"
+	}
+
+	if strings.Contains(subject, "Daytona Sandown Park") {
+		return "Daytona Sandown Park"
 	}
 	return "Unrecognised"
 }
